@@ -7,7 +7,7 @@ import lombok.ToString;
 import main.features.dao.ClientCrudService;
 import main.features.dao.PlanetCrudService;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Table(name = "Ticket")
@@ -20,8 +20,9 @@ public class Ticket {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_at", insertable = false, updatable = false)
+    private Date createdAt;
 
     @ToString.Exclude
     @ManyToOne
