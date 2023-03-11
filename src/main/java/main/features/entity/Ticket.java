@@ -1,17 +1,13 @@
 package main.features.entity;
 
 import jakarta.persistence.*;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Root;
 import lombok.Getter;
 import lombok.Setter;
-import main.features.dao.HibernateUtils;
-import org.hibernate.Session;
-import org.hibernate.annotations.Type;
+import lombok.ToString;
+import main.features.dao.ClientCrudService;
+import main.features.dao.PlanetCrudService;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "Ticket")
@@ -21,19 +17,52 @@ public class Ticket {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name ="id")
-    Long id;
+    @Column(name = "id")
+    private Long id;
 
     @Column(name = "created_at")
-    LocalDateTime createdAt;
-    @Column(name = "client_id")
-    Integer clientId;
-    @Column(name = "from_planet_id")
-    String fromPlanet;
-    @Column(name = "to_planet_id")
-    String toPlanet;
+    private LocalDateTime createdAt;
 
-    public Ticket(){
+    @ToString.Exclude
+    @ManyToOne
+    @JoinColumn(name = "client_id", nullable = false)
+    @Column(name = "client_id")
+    private Client client;
+
+    @ToString.Exclude
+    @ManyToOne
+    @JoinColumn(name = "from_planet_id", nullable = false)
+    @Column(name = "from_planet_id")
+    private Planet fromPlanet;
+    @ToString.Exclude
+    @ManyToOne
+    @JoinColumn(name = "to_planet_id", nullable = false)
+    private Planet toPlanet;
+
+    public Ticket() {
     }
 
+    public static boolean validate(Ticket ticket) {
+        if (ticket == null || ticket.getClient() == null || ticket.getFromPlanet() == null
+                || ticket.getToPlanet() == null) {
+            return false;
+        }
+
+        Client client = new ClientCrudService().findById(ticket.getClient().getId());
+        if (client == null) {
+            return false;
+        }
+
+        Planet fromPlanet = new PlanetCrudService().findById(ticket.getFromPlanet().getId());
+        if (fromPlanet == null) {
+            return false;
+        }
+
+        Planet toPlanet = new PlanetCrudService().findById(ticket.getToPlanet().getId());
+        if (toPlanet == null) {
+            return false;
+        }
+
+        return true;
+    }
 }
