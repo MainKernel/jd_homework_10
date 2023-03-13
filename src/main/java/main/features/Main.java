@@ -13,5 +13,7 @@ public class Main {
         System.out.println("client.getId() = " + client.getId());
         ClientCrudService service = new ClientCrudService();
         service.save(client);
+        System.out.println("client.getId() = " + client.getId());
+
     }
 }

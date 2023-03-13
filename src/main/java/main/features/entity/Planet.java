@@ -1,11 +1,9 @@
 package main.features.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Type;
-
-import java.util.InvalidPropertiesFormatException;
 
 @Entity
 @Table(name = "planet")
@@ -18,34 +16,14 @@ public class Planet {
 
     @Id
     @Column(name = "id")
+    @Pattern(regexp = "^[A-Z0-9]+$")
     private String id;
 
-    @Column(name = "name")
+    @Column(name = "name", columnDefinition = "VARCHAR(500) NOT NULL CHECK(LENGTH(name) >= 1 AND LENGTH(name) <= 500 ")
     private String name;
 
-    public Planet(){
-
-    }
-    public Planet(String id, String name) throws InvalidPropertiesFormatException {
-        if (checkUppercaseOrDigits(id) & (name.length() >= 1 & name.length() <= 500)) {
-            this.id = id;
-            this.name = name;
-        } else {
-            throw new InvalidPropertiesFormatException("Invalid name or id. " +
-                    "Id must be in upper case and can contain digits\n" + ", name must be in range from 1 to 500");
-        }
-    }
-
-
-    public static boolean checkUppercaseOrDigits(String str) {
-        // regular expression to match at least one uppercase letter and all characters are in uppercase, or only digits
-        String pattern = "^(?=.*[A-Z])[A-Z0-9]+$";
-
-        // check if the string matches the pattern
-        if (str.matches(pattern) && str.equals(str.toUpperCase())) {
-            return true;
-        } else {
-            return false;
-        }
+    public Planet(String id, String name) {
+        this.id = id;
+        this.name = name;
     }
 }

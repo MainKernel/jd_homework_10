@@ -27,13 +27,11 @@ public class Ticket {
     @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "client_id", nullable = false)
-    @Column(name = "client_id")
     private Client client;
 
     @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "from_planet_id", nullable = false)
-    @Column(name = "from_planet_id")
     private Planet fromPlanet;
     @ToString.Exclude
     @ManyToOne
@@ -43,27 +41,11 @@ public class Ticket {
     public Ticket() {
     }
 
-    public static boolean validate(Ticket ticket) {
-        if (ticket == null || ticket.getClient() == null || ticket.getFromPlanet() == null
-                || ticket.getToPlanet() == null) {
-            return false;
-        }
-
-        Client client = new ClientCrudService().findById(ticket.getClient().getId());
-        if (client == null) {
-            return false;
-        }
-
-        Planet fromPlanet = new PlanetCrudService().findById(ticket.getFromPlanet().getId());
-        if (fromPlanet == null) {
-            return false;
-        }
-
-        Planet toPlanet = new PlanetCrudService().findById(ticket.getToPlanet().getId());
-        if (toPlanet == null) {
-            return false;
-        }
-
-        return true;
+    public Ticket(Date createdAt, Client client, Planet fromPlanet, Planet toPlanet) {
+        this.createdAt = createdAt;
+        this.client = client;
+        this.fromPlanet = fromPlanet;
+        this.toPlanet = toPlanet;
     }
+
 }

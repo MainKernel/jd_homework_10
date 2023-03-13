@@ -1,59 +1,38 @@
 package main.features.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-import java.util.InvalidPropertiesFormatException;
 
 @Entity
 @Table(name = "Client")
-@Getter
-@Setter
+@Data
 public class Client {
-
     // name validation between 2 and 200
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "name")
+    @Column(name = "name",
+            columnDefinition = "VARCHAR(200) NOT NULL CHECK (LENGTH(name) >= 3) AND CHECK(LENGTH(name) <= 500")
     private String name;
 
-    public Client(){
+    public Client() {
 
     }
 
-    public Client(Long id){
+    public Client (String name){
+        this.name = name;
+    }
+
+    public Client(Long id, String name){
         this.id = id;
+        this.name = name;
+
     }
 
-    public Client(String name) throws InvalidPropertiesFormatException {
-        if(name.length() <= 500 & name.length() >= 2){
-            this.name = name;
-        }else {
-            throw new InvalidPropertiesFormatException("Invalid name length! Name should be between 2 and 500");
-        }
-    }
 
-    public Client(String name, Long id) throws InvalidPropertiesFormatException {
-        if(name.length() <= 500 & name.length() >= 2){
-            this.name = name;
-            this.id = id;
-        }else {
-            throw new InvalidPropertiesFormatException("Invalid name length! Name should be between 2 and 500");
-        }
-    }
-
-    public void setName(String name) throws InvalidPropertiesFormatException {
-        if(name.length() <= 500 & name.length() >= 2){
-            this.name = name;
-        }else {
-            throw new InvalidPropertiesFormatException("Invalid name length! Name should be between 2 and 500");
-        }
-    }
 
     @Override
     public String toString() {
