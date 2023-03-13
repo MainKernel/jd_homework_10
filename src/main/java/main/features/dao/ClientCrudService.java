@@ -1,27 +1,33 @@
 package main.features.dao;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import main.features.entity.Client;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import java.util.List;
 
-interface ClientCrud{
+interface ClientCrud {
     public void save(Client client);
+
     public Client findById(Long id);
+
     public void update(Client client);
+
     public void delete(Client client);
 }
 
-public class ClientCrudService implements ClientCrud{
+public class ClientCrudService implements ClientCrud {
 
     @Override
     public void save(Client client) {
-        try (Session session = HibernateUtils.getSessionFactory().openSession()){
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
-            session.save(client);
+            session.persist(client);
             transaction.commit();
-        } catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -30,7 +36,7 @@ public class ClientCrudService implements ClientCrud{
     public Client findById(Long id) {
         try (Session session = HibernateUtils.getSessionFactory().openSession()) {
             return session.get(Client.class, id);
-        }catch (Exception ex){
+        } catch (Exception ex) {
             System.err.println("User with id: " + id + " not found");
             return null;
         }
@@ -38,11 +44,11 @@ public class ClientCrudService implements ClientCrud{
 
     @Override
     public void update(Client client) {
-        try(Session session = HibernateUtils.getSessionFactory().openSession()){
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
-            session.update(client);
+            session.merge(client);
             transaction.commit();
-        } catch (Exception ex){
+        } catch (Exception ex) {
             System.err.println("Error updating user: " + ex.getMessage());
         }
     }
@@ -51,10 +57,22 @@ public class ClientCrudService implements ClientCrud{
     public void delete(Client client) {
         try (Session session = HibernateUtils.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
-            session.delete(client);
+            session.remove(client);
             transaction.commit();
-        }catch (Exception ex){
+        } catch (Exception ex) {
             System.err.println("Error deleting user: " + ex.getMessage());
+        }
+    }
+
+    public List<Client> getAllClients() {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<Client> criteriaQuery = builder.createQuery(Client.class);
+            Root<Client> root = criteriaQuery.from(Client.class);
+            return session.createQuery(criteriaQuery).getResultList();
+        } catch (Exception ex) {
+            System.err.println("There is no clients");
+            return null;
         }
     }
 }

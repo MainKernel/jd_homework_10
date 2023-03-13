@@ -20,7 +20,7 @@ public class Client {
     private Long id;
 
     @Column(name = "name")
-    String name;
+    private String name;
 
     public Client(){
 
@@ -55,5 +55,11 @@ public class Client {
         }
     }
 
-
+    @Override
+    public String toString() {
+        return "Client{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }
