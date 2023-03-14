@@ -1,14 +1,8 @@
 package main.features.dao;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
 import lombok.SneakyThrows;
 import main.features.entity.Client;
 import main.features.migration.Migration;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.boot.Metadata;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,26 +24,15 @@ class ClientCrudServiceTest {
     @SneakyThrows
     @AfterEach
     public void afterEach() {
-        EntityManager entityManager = HibernateUtils.getSessionFactory().createEntityManager();
-        Session session = entityManager.unwrap(Session.class);
-
-        // get the Hibernate session factory
-        SessionFactory sessionFactory = session.getSessionFactory();
-
-        // get the metadata for all the mapped entities
-        Metadata metadata = sessionFactory.getMetadataBuilder().build();
-
-        // iterate over all the entity names
-        for (String entityName : metadata.getEntityNames()) {
-            // create a query to truncate the table
-            Query query = session.createStoredProcedureQuery("TRUNCATE TABLE " + entityName);
-            query.executeUpdate();
-        }
+        Connection connection = DriverManager.getConnection("jdbc:h2:./test", "sa", "");
+        Statement stmt = connection.createStatement();
+        stmt.executeUpdate("DROP ALL OBJECTS DELETE FILES");
+        connection.close();
     }
 
     @SneakyThrows
     @Test
-    public void createTest() {
+    public void testThatSaveWorks() {
         Client client = new Client("John Doe");
 
         clientCrudService.save(client);
@@ -58,7 +41,7 @@ class ClientCrudServiceTest {
     }
 
     @Test
-    public void getByIdTest() {
+    public void testThatGetByIdWorks() {
         Client client = new Client("John Smith");
         clientCrudService.save(client);
 
@@ -68,7 +51,7 @@ class ClientCrudServiceTest {
 
     @SneakyThrows
     @Test
-    public void updateTest() {
+    public void testThatUpdateWorks() {
         Client client = clientCrudService.findById(1L);
         client.setName("Elvis Smith");
         clientCrudService.update(client);
@@ -78,7 +61,7 @@ class ClientCrudServiceTest {
     }
 
     @Test
-    public void deleteTest() {
+    public void testThatDeleteWorks() {
         List<Client> clients = clientCrudService.getAllClients();
         int clientsCount = clients.size();
 
@@ -87,6 +70,6 @@ class ClientCrudServiceTest {
         List<Client> clients1 = clientCrudService.getAllClients();
         int clientsCount1 = clients1.size();
 
-        assertEquals(clientsCount1, clientsCount);
+        assertEquals(clientsCount1, clientsCount-1);
     }
 }

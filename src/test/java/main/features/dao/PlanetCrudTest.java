@@ -1,71 +1,74 @@
 package main.features.dao;
 
 import lombok.SneakyThrows;
-import main.features.entity.Client;
 import main.features.entity.Planet;
 import main.features.migration.Migration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class PlanetCrudTest {
-    PlanetCrudService crudService = new PlanetCrudService();
+    PlanetCrudService planetCrudService = new PlanetCrudService();
 
     @BeforeEach
     public void setup() throws SQLException {
         Migration.migrate();
     }
 
+    @SneakyThrows
     @AfterEach
     public void afterEach(){
-        Planet planet = crudService.findById("URAN");
-        planet.setName("Uranus");
-        crudService.update(planet);
+        Connection connection = DriverManager.getConnection("jdbc:h2:./test", "sa", "");
+        Statement stmt = connection.createStatement();
+        stmt.executeUpdate("DROP ALL OBJECTS DELETE FILES");
+        connection.close();
     }
 
 
     @SneakyThrows
     @Test
-    void save() {
+    void testThatSaveworks() {
         Planet planet = new Planet("MARS2", "mars2");
-        crudService.save(planet);
-        List<Planet> planets = crudService.getAllPlanets();
+        planetCrudService.save(planet);
 
-        assertEquals("mars2", crudService.findById("MARS2").getName());
+        assertTrue(planet.equals(planetCrudService.findById(planet.getId())));
     }
 
     @Test
-    void findById() {
-        Planet planet = crudService.findById("MARS");
+    void testThatFindByIdWorks() {
+        Planet planet = planetCrudService.findById("MARS");
 
         assert("mars".equalsIgnoreCase(planet.getName()));
     }
 
     @Test
-    void update() {
-        Planet planet = crudService.findById("URAN");
+    void TestThatUpdateWorks() {
+        Planet planet = planetCrudService.findById("URAN");
         planet.setName("Uran");
-        crudService.update(planet);
+        planetCrudService.update(planet);
 
-        assert ("Uran".equalsIgnoreCase(crudService.findById("URAN").getName()));
+        assert ("Uran".equalsIgnoreCase(planetCrudService.findById("URAN").getName()));
 
     }
 
     @Test
-    void delete() {
-        List<Planet> planets = crudService.getAllPlanets();
-        String maxId = planets.get(planets.size()-1).getId();
+    void testThatDeleteWorks() {
+        List<Planet> clients = planetCrudService.getAllPlanets();
+        int clientsCount = clients.size();
 
-        Planet planet = crudService.findById(maxId);
-        crudService.delete(planet);
+        planetCrudService.delete(planetCrudService.findById("MARS"));
 
+        List<Planet> clients1 = planetCrudService.getAllPlanets();
+        int clientsCount1 = clients1.size();
 
-        Planet deletedClient = crudService.findById(maxId);
-        assertNull(deletedClient);
+        assertEquals(clientsCount1, clientsCount-1);
     }
 }
