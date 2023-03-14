@@ -17,7 +17,7 @@ class ClientCrudServiceTest {
     ClientCrudService clientCrudService = new ClientCrudService();
 
     @BeforeEach
-    public void setup() throws SQLException {
+    public void setup() {
         Migration.migrate();
     }
 

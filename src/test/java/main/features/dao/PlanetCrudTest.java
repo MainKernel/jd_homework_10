@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
@@ -19,7 +18,7 @@ class PlanetCrudTest {
     PlanetCrudService planetCrudService = new PlanetCrudService();
 
     @BeforeEach
-    public void setup() throws SQLException {
+    public void setup() {
         Migration.migrate();
     }
 
@@ -35,11 +34,11 @@ class PlanetCrudTest {
 
     @SneakyThrows
     @Test
-    void testThatSaveworks() {
+    void testThatSaveWorks() {
         Planet planet = new Planet("MARS2", "mars2");
         planetCrudService.save(planet);
 
-        assertTrue(planet.equals(planetCrudService.findById(planet.getId())));
+        assertEquals(planet, planetCrudService.findById(planet.getId()));
     }
 
     @Test
